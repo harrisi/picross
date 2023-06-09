@@ -4,7 +4,8 @@ const keysRows = document.querySelector('#keys-rows')
 const keysCols = document.querySelector('#keys-cols')
 const btnMark = document.querySelector('#btn-mark')
 
-const boardLength = 5
+const boardLength = 10
+
 const cellSize = boardElement.clientWidth / boardLength
 let board = Array.from({ length: boardLength },
   () => Array.from({ length: boardLength },
@@ -28,18 +29,14 @@ const checkCell = (x, y) => {
 }
 
 const getTarget = (target) => {
+  // this is a bit hacky, but it works for now
+  // the issue is that when moving the pointer, the target can be the grid,
+  // which is the board container.
   if (target.classList.contains('cell')) return target
   else return target.parentElement
 }
 
-boardElement.addEventListener('pointerdown', (e) => {
-  e.preventDefault()
-  // only allow left click
-  // this needs some work though.
-  if (e.button != 0) return
-  const target = getTarget(e.target)
-  if (target == boardContainer) return
-  boardState.startCell = target
+const handleCell = (target) => {
   const { x, y } = getXY(target.id)
   if (board[x][y].dirty) return
   if (checkCell(x, y)) {
@@ -57,6 +54,17 @@ boardElement.addEventListener('pointerdown', (e) => {
     target.classList.add('error')
   }
   board[x][y].dirty = true
+}
+
+boardElement.addEventListener('pointerdown', (e) => {
+  e.preventDefault()
+  // only allow left click
+  // this needs some work though.
+  if (e.button != 0) return
+  const target = getTarget(e.target)
+  if (target == boardContainer) return
+  boardState.startCell = target
+  handleCell(target)
   checkBoard()
 })
 
@@ -72,14 +80,10 @@ boardElement.addEventListener('pointermove', (e) => {
   const startCell = { x: startCellId[0], y: startCellId[1] }
   const targetCell = { x: targetCellId[0], y: targetCellId[1] }
 
-  const { x, y } = getXY(target.id)
-
   if (boardState.axis == null) {
     const axis = startCell.x == targetCell.x ? 'x' : 'y'
     boardState.axis = axis
   }
-
-  if (board[x][y].dirty) return
 
   if (boardState.axis == 'x') {
     if (startCell.x != targetCell.x) return
@@ -87,23 +91,7 @@ boardElement.addEventListener('pointermove', (e) => {
     if (startCell.y != targetCell.y) return
   }
 
-  // this should actually draw based on the axis, so if axis == 'x' then draw a horizontal line
-  // regardless of where on the y axis the target is. Same for axis == 'y' but vertical.
-  if (checkCell(x, y)) {
-    target.classList.replace(board[x][y].state, boardState.mark)
-    if (boardState.mark == 'cross') {
-      const xEl = document.createElement('div')
-      xEl.classList.add('x')
-      target.append(xEl)
-    }
-  } else if (board[x][y].state == 'empty'){
-    target.classList.replace('empty', 'cross')
-    target.classList.add('error')
-  } else if (board[x][y].state == 'shouldFill') {
-    target.classList.replace('shouldFill', 'fill')
-    target.classList.add('error')
-  }
-  board[x][y].dirty = true
+  handleCell(target)
   checkBoard()
 })
 
@@ -114,6 +102,17 @@ window.addEventListener('pointerup', (e) => {
 
 btnMark.addEventListener('click', (e) => {
   e.preventDefault()
+  toggleMark()
+})
+
+window.addEventListener('keydown', (e) => {
+  if (e.key == ' ') {
+    e.preventDefault()
+    toggleMark()
+  }
+})
+
+const toggleMark = () => {
   if (boardState.mark == 'fill') {
     boardState.mark = 'cross'
     btnMark.textContent = '[]'
@@ -121,7 +120,7 @@ btnMark.addEventListener('click', (e) => {
     boardState.mark = 'fill'
     btnMark.textContent = 'X'
   }
-})
+}
 
 clearBoardState = () => {
   boardState.startCell = null
@@ -165,6 +164,12 @@ const loadBoard = () => {
       })
     )
 }
+
+const setGridCSS = (() => {
+  const gridTemplate = `repeat(${boardLength}, 1fr)`
+  boardElement.style.gridTemplateColumns = gridTemplate
+  boardElement.style.gridTemplateRows = gridTemplate
+})
 
 const initBoard = () => {
   loadBoard()
@@ -276,4 +281,5 @@ const checkBoard = () => {
   // }
 }
 
+setGridCSS()
 initBoard()
