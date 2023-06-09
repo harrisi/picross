@@ -54,24 +54,16 @@ li {
 #keys-cols ol {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  height: 100%;
-  width: 100%;
 }
 
 #keys-rows ol {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  height: 100%;
-  width: 100%;
 }
-
-/* li.clue {
-  display: inline;
-} */
 
 #container {
   display: grid;
