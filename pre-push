@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+mkdir build &> /dev/null
+
+tar czf build/picross.tar.gz *.{html,js,css}
+
+scp build/picross.tar.gz $PICROSS_SFTP_ADDRESS:
+
+ssh $PICROSS_SSH_ADDRESS /bin/bash << EOF
+find $PICROSS_DIR -mindepth 1 -delete
+tar xzf picross.tar.gz -C $PICROSS_DIR
+EOF
+
+exit $?
