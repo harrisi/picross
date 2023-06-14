@@ -128,6 +128,7 @@ export function instrument({ board, state, elements }) {
           const xEl = document.createElement('div')
           xEl.classList.add('x')
           cellEl.append(xEl)
+          board[i][y].state = 'cross'
         }
       }
       const row = document.getElementById(`row-${x}`)
@@ -143,6 +144,7 @@ export function instrument({ board, state, elements }) {
           const xEl = document.createElement('div')
           xEl.classList.add('x')
           cellEl.append(xEl)
+          board[i][y].state = 'cross'
         }
       }
       const col = document.getElementById(`col-${y}`)
