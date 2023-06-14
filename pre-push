@@ -2,7 +2,7 @@
 
 mkdir build &> /dev/null
 
-tar czf build/picross.tar.gz *.{html,js,css}
+tar czf build/picross.tar.gz *.{html,css} js
 
 scp build/picross.tar.gz $PICROSS_SFTP_ADDRESS:
 
